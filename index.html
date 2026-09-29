@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <base target="_top">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestão de Inventário</title>
+</head>
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      color: #0f172a;
+      min-height: 100vh;
+      display: flex;
+    }
+    
+    /* Sidebar Area */
+    .sidebar {
+      width: 250px;
+      background-color: #18181b;
+      color: #f4f4f5;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 1rem;
+    }
+    .sidebar-brand {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 2rem;
+      padding: 0 0.5rem;
+    }
+    .sidebar-brand i {
+      color: #3b82f6;
+      font-size: 1.4rem;
+    }
+    .nav-sidebar {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .nav-sidebar .nav-link {
+      color: #a1a1aa;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .nav-sidebar .nav-link:hover {
+      color: #f4f4f5;
+      background-color: #27272a;
+    }
+    .nav-sidebar .nav-link.active {
+      color: #ffffff;
+      background-color: #27272a;
+      border-left: 3px solid #3b82f6;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex-grow: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .page-title h4 {
+      font-weight: 700;
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    .page-title p {
+      color: #64748b;
+      margin: 0;
+      font-size: 0.875rem;
+    }
+
+    /* Card Box */
+    .card-saas {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px 0 rgba(0,0,0,0.02);
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Table Customization */
+    .table-responsive {
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      overflow: hidden;
+    }
+    .table {
+      margin-bottom: 0;
+    }
+    .table thead th {
+      background-color: #f8fafc;
+      color: #64748b;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .table tbody td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.875rem;
+      color: #334155;
+    }
+    .table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .table tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    /* Badges */
+    .badge-saas {
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      border: none;
+    }
+    .badge-saas-no {
+      background-color: #dcfce7;
+      color: #15803d;
+    }
+    .badge-saas-yes {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* Controls */
+    .btn-qty {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      line-height: 1;
+      border-radius: 6px;
+      font-weight: 600;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #475569;
+    }
+    .btn-qty:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .btn-sort {
+      border: none;
+      background: transparent;
+      padding: 0 2px;
+      color: #94a3b8;
+      cursor: pointer;
+    }
+    .btn-sort:hover, .btn-sort.active {
+      color: #3b82f6;
+    }
+
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.875rem;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <i class="bi bi-cpu-fill"></i>
+      <span>Inventário de TI</span>
+    </div>
+    <ul class="nav-sidebar">
+      <li>
+        <a class="nav-link active" onclick="carregarCategoria('NOTEBOOKS', this)">
+          <i class="bi bi-laptop"></i> Notebooks
+        </a>
+      </li>
+      <li>
+        <a class="nav-link" onclick="carregarCategoria('DESKTOPS', this)">
+          <i class="bi bi-display"></i> Desktops
+        </a>
+      </li>
+      <li>
+        <a class="nav-link" onclick="carregarCategoria('CELULARES', this)">
+          <i class="bi bi-phone"></i> Celulares
+        </a>
+      </li>
+      <li>
+        <a class="nav-link" onclick="carregarCategoria('PERIFÉRICOS', this)">
+          <i class="bi bi-mouse2"></i> Periféricos
+        </a>
+      </li>
+      <li>
+        <a class="nav-link" onclick="carregarCategoria('OUTROS', this)">
+          <i class="bi bi-box"></i> Outros
+        </a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <main class="main-content">
+    
+    <!-- Top Header -->
+    <div class="top-header">
+      <div class="page-title">
+        <h4 id="lblCategoriaHeader">Notebooks</h4>
+        <p>Gerencie o estoque e alocação de dispositivos</p>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="card-saas">
+      <div class="row g-2 align-items-center">
+        <div class="col-md-3">
+          <select id="selCampoBusca" class="form-select" onchange="filtrarTabela()">
+            <option value="nome">Nome do Item</option>
+            <option value="serial">Serial</option>
+            <option value="patrimonio">Patrimônio</option>
+            <option value="observacao">Observação</option>
+          </select>
+        </div>
+        <div class="col-md-9">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+            <input type="text" id="txtBusca" class="form-control border-start-0 ps-0" placeholder="Pesquisar registros..." oninput="filtrarTabela()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Item Form -->
+    <div class="card-saas">
+      <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-plus-lg me-1"></i> Adicionar Item em <span id="lblCategoriaForm">NOTEBOOKS</span></h6>
+      <form id="formNovoItem" onsubmit="event.preventDefault(); cadastrarNovoItem();">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <input type="text" id="txtNome" class="form-control" placeholder="Nome do Item" required>
+          </div>
+          <div class="col-md-1">
+            <input type="number" id="txtQuantidade" class="form-control" placeholder="Qtd" value="1" min="1" required>
+          </div>
+          <div class="col-md-2">
+            <input type="text" id="txtLocalizacao" class="form-control" placeholder="Caixa / Localização" required>
+          </div>
+          <div class="col-md-2 div-completo">
+            <input type="text" id="txtSerial" class="form-control" placeholder="Serial">
+          </div>
+          <div class="col-md-2 div-completo">
+            <input type="text" id="txtPatrimonio" class="form-control" placeholder="Patrimônio">
+          </div>
+          <div class="col-md-2 div-completo">
+            <select id="selDanificado" class="form-select">
+              <option value="NÃO">NÃO (Perfeito)</option>
+              <option value="SIM">SIM (Danificado)</option>
+            </select>
+          </div>
+          <div class="col-md-12">
+            <input type="text" id="txtObservacao" class="form-control" placeholder="Observações adicionais (opcional)">
+          </div>
+        </div>
+        <div class="mt-3 text-end">
+          <button type="submit" class="btn btn-primary px-4" style="background-color: #2563eb; border: none; border-radius: 8px;">
+            <i class="bi bi-check2 me-1"></i> Cadastrar Item
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>
+              Nome do Item 
+              <button class="btn-sort" onclick="ordenarPor('nome')" title="Ordenar Nome"><i class="bi bi-arrow-down-up" id="sort_nome"></i></button>
+            </th>
+            <th class="text-center">
+              Qtd 
+              <button class="btn-sort" onclick="ordenarPor('quantidade')" title="Ordenar Quantidade"><i class="bi bi-arrow-down-up" id="sort_quantidade"></i></button>
+            </th>
+            <th class="text-center">
+              Localização 
+              <button class="btn-sort" onclick="ordenarPor('localizacao')" title="Ordenar Localização"><i class="bi bi-arrow-down-up" id="sort_localizacao"></i></button>
+            </th>
+            <th class="text-center th-completo">
+              Serial 
+              <button class="btn-sort" onclick="ordenarPor('serial')" title="Ordenar Serial"><i class="bi bi-arrow-down-up" id="sort_serial"></i></button>
+            </th>
+            <th class="text-center th-completo">
+              Patrimônio 
+              <button class="btn-sort" onclick="ordenarPor('patrimonio')" title="Ordenar Patrimônio"><i class="bi bi-arrow-down-up" id="sort_patrimonio"></i></button>
+            </th>
+            <th class="text-center th-completo">
+              Danificado 
+              <button class="btn-sort" onclick="ordenarPor('danificado')" title="Ordenar Status"><i class="bi bi-arrow-down-up" id="sort_danificado"></i></button>
+            </th>
+            <th class="text-center">
+              Observação 
+              <button class="btn-sort" onclick="ordenarPor('observacao')" title="Ordenar Observação"><i class="bi bi-arrow-down-up" id="sort_observacao"></i></button>
+            </th>
+            <th class="text-center">Status</th>
+          </tr>
+        </thead>
+        <tbody id="tblCorpo">
+          <tr><td colspan="8" class="text-center text-muted py-4">Carregando dados...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <script>
+    var categoriaAtual = 'NOTEBOOKS';
+    var dadosAtuais = [];
+    var ordenacaoAtual = { campo: null, asc: true };
+
+    document.addEventListener("DOMContentLoaded", function() {
+      carregarTabela();
+    });
+
+    function carregarCategoria(cat, elemento) {
+      categoriaAtual = cat;
+      ordenacaoAtual = { campo: null, asc: true };
+      resetarIconesOrdenacao();
+      document.getElementById('txtBusca').value = '';
+
+      document.querySelectorAll('.nav-link').forEach(function(el) { el.classList.remove('active'); });
+      elemento.classList.add('active');
+      document.getElementById('lblCategoriaHeader').innerText = cat;
+      document.getElementById('lblCategoriaForm').innerText = cat;
+
+      var camposCompletos = document.querySelectorAll('.div-completo, .th-completo');
+      if (cat === 'OUTROS') {
+        camposCompletos.forEach(function(el) { el.style.display = 'none'; });
+      } else {
+        camposCompletos.forEach(function(el) { el.style.display = 'table-cell'; });
+        document.querySelectorAll('.div-completo').forEach(function(el) { el.style.display = 'block'; });
+      }
+
+      carregarTabela();
+    }
+
+    function carregarTabela() {
+      var tbody = document.getElementById('tblCorpo');
+      var colSpan = categoriaAtual === 'OUTROS' ? 5 : 8;
+      tbody.innerHTML = '<tr><td colspan="' + colSpan + '" class="text-center text-muted py-4"><div class="spinner-border spinner-border-sm me-2 text-primary"></div>Carregando...</td></tr>';
+
+      google.script.run
+        .withSuccessHandler(function(itens) {
+          dadosAtuais = itens || [];
+          filtrarTabela();
+        })
+        .withFailureHandler(tratarErro)
+        .getInventario(categoriaAtual);
+    }
+
+    function filtrarTabela() {
+      var termo = document.getElementById('txtBusca').value.toLowerCase().trim();
+      var campoBusca = document.getElementById('selCampoBusca').value;
+
+      var dadosFiltrados = dadosAtuais.filter(function(item) {
+        if (!termo) return true;
+        var valorCampo = String(item[campoBusca] || '').toLowerCase();
+        return valorCampo.indexOf(termo) !== -1;
+      });
+
+      if (ordenacaoAtual.campo) {
+        aplicarOrdenacao(dadosFiltrados);
+      }
+
+      exibirTabela(dadosFiltrados);
+    }
+
+    function resetarIconesOrdenacao() {
+      var campos = ['nome', 'quantidade', 'localizacao', 'serial', 'patrimonio', 'danificado', 'observacao'];
+      campos.forEach(function(campo) {
+        var el = document.getElementById('sort_' + campo);
+        if (el) {
+          el.className = 'bi bi-arrow-down-up';
+          el.parentElement.classList.remove('active');
+        }
+      });
+    }
+
+    function ordenarPor(campo) {
+      if (ordenacaoAtual.campo === campo) {
+        ordenacaoAtual.asc = !ordenacaoAtual.asc;
+      } else {
+        ordenacaoAtual.campo = campo;
+        ordenacaoAtual.asc = true;
+      }
+
+      resetarIconesOrdenacao();
+
+      var el = document.getElementById('sort_' + campo);
+      if (el) {
+        el.className = ordenacaoAtual.asc ? 'bi bi-sort-alpha-down' : 'bi bi-sort-alpha-up-alt';
+        if (campo === 'quantidade') {
+          el.className = ordenacaoAtual.asc ? 'bi bi-sort-numeric-down' : 'bi bi-sort-numeric-up-alt';
+        }
+        el.parentElement.classList.add('active');
+      }
+
+      filtrarTabela();
+    }
+
+    function aplicarOrdenacao(lista) {
+      var campo = ordenacaoAtual.campo;
+      var asc = ordenacaoAtual.asc;
+
+      lista.sort(function(a, b) {
+        var valA = a[campo];
+        var valB = b[campo];
+
+        if (campo === 'quantidade') {
+          valA = Number(valA) || 0;
+          valB = Number(valB) || 0;
+          return asc ? valA - valB : valB - valA;
+        } else {
+          valA = String(valA || '').toLowerCase();
+          valB = String(valB || '').toLowerCase();
+          if (valA < valB) return asc ? -1 : 1;
+          if (valA > valB) return asc ? 1 : -1;
+          return 0;
+        }
+      });
+    }
+
+    function exibirTabela(itens) {
+      var tbody = document.getElementById('tblCorpo');
+      tbody.innerHTML = '';
+      var colSpan = categoriaAtual === 'OUTROS' ? 5 : 8;
+
+      if (!itens || itens.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="' + colSpan + '" class="text-center text-muted py-4">Nenhum item encontrado.</td></tr>';
+        return;
+      }
+
+      itens.forEach(function(item) {
+        var tr = document.createElement('tr');
+        
+        var statusStr = String(item.danificado).toUpperCase();
+        var isSim = statusStr.indexOf('SIM') !== -1 || statusStr.indexOf('CARCAÇA') !== -1;
+        
+        var badgeClass = isSim ? 'badge-saas-yes' : 'badge-saas-no';
+        var selOptNo = !isSim ? 'selected' : '';
+        var selOptYes = isSim ? 'selected' : '';
+
+        var tdCamposEspecificos = '';
+        if (categoriaAtual !== 'OUTROS') {
+          tdCamposEspecificos = `<td class="text-center text-muted small">${item.serial}</td>
+            <td class="text-center text-muted small">${item.patrimonio}</td>
+            <td class="text-center">
+              <select class="form-select form-select-sm d-inline-block w-auto badge-saas ${badgeClass}" onchange="alterarDanificado(${item.rowIndex}, this)">
+                <option value="NÃO" ${selOptNo}>NÃO</option>
+                <option value="SIM" ${selOptYes}>SIM</option>
+              </select>
+            </td>`;
+        }
+
+        tr.innerHTML = `<td class="fw-semibold text-dark">${item.nome}</td>
+          <td class="text-center">
+            <button class="btn-qty me-1" onclick="alterarQtd(${item.rowIndex}, -1)">-</button>
+            <span class="fw-bold mx-2" id="qtd_${item.rowIndex}">${item.quantidade}</span>
+            <button class="btn-qty ms-1" onclick="alterarQtd(${item.rowIndex}, 1)">+</button>
+          </td>
+          <td class="text-center">
+            <input type="text" class="form-control form-control-sm text-center d-inline-block" style="max-width: 130px;" value="${item.localizacao}" onchange="alterarLocalizacao(${item.rowIndex}, this.value)">
+          </td>
+          ${tdCamposEspecificos}
+          <td class="text-center">
+            <input type="text" class="form-control form-control-sm text-center" value="${item.observacao}" onchange="alterarObservacao(${item.rowIndex}, this.value)">
+          </td>
+          <td class="text-center">
+            <span class="text-success small"><i class="bi bi-cloud-check-fill me-1"></i>Salvo</span>
+          </td>`;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function alterarQtd(rowIndex, delta) {
+      var item = dadosAtuais.find(function(i) { return i.rowIndex === rowIndex; });
+      if (item) {
+        item.quantidade = Math.max(0, item.quantidade + delta);
+        var spanQtd = document.getElementById('qtd_' + rowIndex);
+        if (spanQtd) spanQtd.innerText = item.quantidade;
+      }
+      google.script.run.alterarQuantidade(categoriaAtual, rowIndex, delta);
+    }
+
+    function alterarLocalizacao(rowIndex, novaLoc) {
+      var item = dadosAtuais.find(function(i) { return i.rowIndex === rowIndex; });
+      if (item) item.localizacao = novaLoc;
+      google.script.run.alterarLocalizacao(categoriaAtual, rowIndex, novaLoc);
+    }
+
+    function alterarDanificado(rowIndex, selectElem) {
+      var novoStatus = selectElem.value;
+      var item = dadosAtuais.find(function(i) { return i.rowIndex === rowIndex; });
+      if (item) item.danificado = novoStatus;
+
+      if (novoStatus === 'SIM') {
+        selectElem.className = 'form-select form-select-sm d-inline-block w-auto badge-saas badge-saas-yes';
+      } else {
+        selectElem.className = 'form-select form-select-sm d-inline-block w-auto badge-saas badge-saas-no';
+      }
+
+      google.script.run.alterarDanificado(categoriaAtual, rowIndex, novoStatus);
+    }
+
+    function alterarObservacao(rowIndex, novaObs) {
+      var item = dadosAtuais.find(function(i) { return i.rowIndex === rowIndex; });
+      if (item) item.observacao = novaObs;
+      google.script.run.alterarObservacao(categoriaAtual, rowIndex, novaObs);
+    }
+
+    function cadastrarNovoItem() {
+      var nome = document.getElementById('txtNome').value;
+      var qtd = document.getElementById('txtQuantidade').value;
+      var loc = document.getElementById('txtLocalizacao').value;
+      var serial = document.getElementById('txtSerial').value || '-';
+      var patrimonio = document.getElementById('txtPatrimonio').value || '-';
+      var danificado = document.getElementById('selDanificado').value;
+      var observacao = document.getElementById('txtObservacao').value || '';
+
+      google.script.run
+        .withSuccessHandler(function() {
+          document.getElementById('txtNome').value = '';
+          document.getElementById('txtQuantidade').value = '1';
+          document.getElementById('txtLocalizacao').value = '';
+          document.getElementById('txtSerial').value = '';
+          document.getElementById('txtPatrimonio').value = '';
+          document.getElementById('txtObservacao').value = '';
+          carregarTabela();
+        })
+        .withFailureHandler(tratarErro)
+        .adicionarItem(categoriaAtual, nome, qtd, loc, serial, patrimonio, danificado, observacao);
+    }
+
+    function tratarErro(e) {
+      alert("Erro ao comunicar com o servidor: " + e.message);
+    }
+  </script>
+</body>
+</html>
